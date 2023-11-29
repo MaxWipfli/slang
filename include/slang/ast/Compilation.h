@@ -181,6 +181,9 @@ struct SLANG_EXPORT CompilationOptions {
     /// A list of library names, in the order in which they should be searched
     /// when binding cells to instances.
     std::vector<std::string> defaultLiblist;
+
+    /// A list of module names that are expected and allowed to be unknown.
+    flat_hash_set<std::string_view> blackboxModules;
 };
 
 /// A node in a tree representing an instance in the design

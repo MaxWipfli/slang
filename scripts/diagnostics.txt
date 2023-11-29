@@ -315,6 +315,7 @@ error UnusedPortDecl "port declaration '{}' does not match any port in the modul
 error UnknownPackage "unknown package '{}'"
 error UnknownModule "unknown module '{}'"
 error UnknownInterface "unknown interface '{}'"
+error DefinedBlackboxModule "blackbox module '{}' has been unexpectedly defined"
 error UnknownPrimitive "unknown user-defined primitive '{}'"
 error InstanceNameRequired "instance name is required"
 error InstanceWithStrength "cannot instantiate '{}' with a drive strength"

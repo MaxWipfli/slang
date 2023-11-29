@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
         if (!exists(std::filesystem::path(tidyConfigFile.value())))
             slang::OS::printE(fmt::format("the path provided for the config file does not exist {}",
                                           tidyConfigFile.value()));
-        tidyConfig = TidyConfigParser(tidyConfigFile.value()).getConfig();
+        tidyConfig = TidyConfigParser(std::filesystem::path(tidyConfigFile.value())).getConfig();
     }
     else if (auto path = project_slang_tidy_config()) {
         tidyConfig = TidyConfigParser(path.value()).getConfig();
@@ -138,6 +138,8 @@ int main(int argc, char** argv) {
 
     // Check all enabled checks
     for (const auto& checkName : Registry::getEnabledChecks()) {
+        driver.diagClient->clear();
+
         const auto check = Registry::create(checkName);
         OS::print(fmt::format("[{}]", check->name()));
 
@@ -151,7 +153,6 @@ int main(int argc, char** argv) {
             for (const auto& diag : check->getDiagnostics())
                 driver.diagEngine.issue(diag);
             OS::print(fmt::format("{}\n", driver.diagClient->getString()));
-            driver.diagClient->clear();
         }
         else {
             OS::print(fmt::emphasis::bold | fmt::fg(fmt::color::green), " PASS\n");

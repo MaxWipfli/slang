@@ -167,6 +167,9 @@ void Driver::addStandardArgs() {
                 "One or more parameter overrides to apply when "
                 "instantiating top-level modules",
                 "<name>=<value>");
+    cmdLine.add("--blackbox", options.blackboxModules,
+                "One or more modules that are allowed and expected to not be defined",
+                "<name>", CommandLineFlags::CommaList);
     cmdLine.add("-L", options.libraryOrder,
                 "A list of library names that controls the priority order for module lookup",
                 "<library>", CommandLineFlags::CommaList);
@@ -694,6 +697,8 @@ void Driver::addCompilationOptions(Bag& bag) const {
         coptions.paramOverrides.emplace_back(opt);
     for (auto& lib : options.libraryOrder)
         coptions.defaultLiblist.emplace_back(lib);
+    for (auto& name : options.blackboxModules)
+        coptions.blackboxModules.emplace(name);
 
     if (options.minTypMax.has_value()) {
         if (options.minTypMax == "min")

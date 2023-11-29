@@ -384,7 +384,13 @@ void InstanceSymbol::fromSyntax(Compilation& comp, const HierarchyInstantiationS
     }
 
     auto definition = comp.getDefinition(syntax.type.valueText(), *context.scope);
-    if (!definition) {
+    auto isBlackbox = comp.getOptions().blackboxModules.contains(syntax.type.valueText());
+    if (isBlackbox && definition) {
+        auto& diag = context.addDiag(diag::DefinedBlackboxModule, syntax.type.range()) << syntax.type.valueText();
+        diag.addNote(diag::NoteDeclarationHere, definition->location);
+        return;
+    }
+    else if (!definition) {
         // This might actually be a user-defined primitive instantiation.
         if (auto prim = comp.getPrimitive(syntax.type.valueText())) {
             PrimitiveInstanceSymbol::fromSyntax(*prim, syntax, context, results, implicitNets);
@@ -403,7 +409,8 @@ void InstanceSymbol::fromSyntax(Compilation& comp, const HierarchyInstantiationS
             // If not set, we error about the missing module, unless we see an extern
             // module or UDP declaration for this name, in which case we provide a
             // slightly different error.
-            if (!comp.hasFlag(CompilationFlags::IgnoreUnknownModules) &&
+            if (!isBlackbox &&
+                !comp.hasFlag(CompilationFlags::IgnoreUnknownModules) &&
                 !comp.errorIfMissingExternModule(syntax.type.valueText(), *context.scope,
                                                  syntax.type.range()) &&
                 !comp.errorIfMissingExternPrimitive(syntax.type.valueText(), *context.scope,

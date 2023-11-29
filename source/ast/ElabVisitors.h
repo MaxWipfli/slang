@@ -644,6 +644,9 @@ private:
         if (!syntax || symbol.name.empty())
             return;
 
+        if (symbol.name.starts_with("unused_"sv))
+            return;
+
         auto [rvalue, lvalue] = compilation.isReferenced(*syntax);
 
         auto portRef = symbol.getFirstPortBackref();
